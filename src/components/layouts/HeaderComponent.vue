@@ -74,7 +74,7 @@
               <!-- Mobile menu button -->
               <button
                 type="button"
-                @click="isOpen = !isOpen"
+                @click="isMenuOpen = !isMenuOpen"
                 class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                 aria-controls="mobile-menu"
                 aria-expanded="false"
@@ -128,74 +128,111 @@
               </button>
             </div>
             <div class="hidden lg:flex lg:items-center">
-              <!-- Profile dropdown -->
-              <div class="relative flex-shrink-0">
+              <div class="flex-shrink-0">
                 <div>
-                  <button
-                    type="button"
-                    class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    id="user-menu-button"
-                    aria-expanded="false"
-                    aria-haspopup="true"
-                  >
-                    <span class="sr-only">Open user menu</span>
-                    <!-- <div class="nav-item dropdown">
-                    <a
-                      class="nav-link dropdown-toggle d-flex align-items-center"
-                      href="#"
-                      id="navbarDropdown"
-                      role="button"
-                      data-toggle="dropdown"
-                      aria-haspopup="true"
-                      aria-expanded="false"
+                  <div v-if="!userInfo" class="flex align-items-center">
+                    <router-link
+                      to="/login"
+                      class="hover:no-underline mr-3 ml-1 text-gray-900 hover:text-gray-500 inline-flex items-center text-sm font-medium"
+                      >Login
+                    </router-link>
+                    <router-link
+                      to="/register"
+                      class="inline-flex items-center px-2 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 active:outline-none active:ring-2 hover:no-underline active:ring-offset-2 active:ring-indigo-500"
                     >
-                      Hi <b class="mx-1">{{Auth::user()->name}}</b>
-                      <img
-                        class="mr-1"
-                        style="height: 30px; border-radius: 50%"
-                        src="{{Auth::user()->avatar}}"
-                        alt=""
-                      />!
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a class="dropdown-item" href="#">Account Setting</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="{{route('auth.logout')}}">Logout</a>
-                    </div>
-                  </div> -->
-                    <div class="flex align-items-center">
-                      <router-link
-                        to="/login"
-                        class="hover:no-underline mr-3 ml-1 text-gray-900 hover:text-gray-500 inline-flex items-center text-sm font-medium"
-                        >Login</router-link
+                      <svg
+                        class="-ml-1 mr-1 h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
                       >
-                      <router-link
-                        to="/register"
-                        class="inline-flex items-center px-2 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 active:outline-none active:ring-2 hover:no-underline active:ring-offset-2 active:ring-indigo-500"
+                        <path
+                          fill-rule="evenodd"
+                          d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      <span class="hover:no-underline text-sm font-medium">Register</span>
+                    </router-link>
+                  </div>
+                  <div v-else class="relative">
+                    <button
+                      @click="isDropdownOpen = !isDropdownOpen"
+                      id="dropdownInformationButton"
+                      data-dropdown-toggle="dropdownInformation"
+                      class="text-black font-medium rounded-lg text-sm p-1 text-center inline-flex items-center"
+                      type="button"
+                    >
+                      <img :src="userInfo.user.avatar" width="32" class="rounded-full" alt="" />
+                      <svg
+                        class="w-4 h-4 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        <svg
-                          class="-ml-1 mr-1 h-5 w-5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          aria-hidden="true"
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        ></path>
+                      </svg>
+                    </button>
+
+                    <!-- Dropdown menu -->
+                    <div
+                      id="dropdownInformation"
+                      :class="{ hidden: isDropdownOpen }"
+                      class="z-10 absolute top-full bg-white divide-y divide-gray-100 rounded shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
+                    >
+                      <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                        <div>{{ userInfo.user.name }}</div>
+                        <div class="font-medium truncate">{{ userInfo.user.email }}</div>
+                      </div>
+                      <ul
+                        class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                        aria-labelledby="dropdownInformationButton"
+                      >
+                        <li>
+                          <a
+                            href="#"
+                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                            >Dashboard</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            href="#"
+                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                            >Settings</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            href="#"
+                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                            >Earnings</a
+                          >
+                        </li>
+                      </ul>
+                      <div class="py-1">
+                        <a
+                          href="#"
+                          @click="logoutProcess"
+                          class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                          >Sign out</a
                         >
-                          <path
-                            fill-rule="evenodd"
-                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                        <span class="hover:no-underline text-sm font-medium">Register</span>
-                      </router-link>
+                      </div>
                     </div>
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div :class="{ hidden: isOpen }" class="lg:hidden" id="mobile-menu">
+        <div :class="{ hidden: isMenuOpen }" class="lg:hidden" id="mobile-menu">
           <div class="pt-2 pb-3 space-y-1">
             <a
               href="#"
@@ -218,21 +255,20 @@
               >Calendar</a
             >
           </div>
-          <div class="pt-4 pb-3 border-t border-gray-200">
+          <div v-if="userInfo" class="pt-4 pb-3 border-t border-gray-200">
             <div class="flex items-center px-4">
               <div class="flex-shrink-0">
-                <img class="h-10 w-10 rounded-full" src="https://vi.vuejs.org/images/logo.png" alt="" />
+                <img class="h-10 w-10 rounded-full" :src="userInfo.user.avatar" alt="" />
               </div>
               <div class="ml-3">
-                <div class="text-base font-medium text-gray-800">vukm</div>
-                <div class="text-sm font-medium text-gray-500">vukm@gmail.com</div>
+                <div class="text-base font-medium text-gray-800">{{ userInfo.user.name }}</div>
+                <div class="text-sm font-medium text-gray-500">{{ userInfo.user.email }}</div>
               </div>
               <button
                 type="button"
                 class="ml-auto flex-shrink-0 bg-white p-1 text-gray-400 rounded-full hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <span class="sr-only">View notifications</span>
-                <!-- Heroicon name: outline/bell -->
                 <svg
                   class="h-6 w-6"
                   xmlns="http://www.w3.org/2000/svg"
@@ -263,6 +299,7 @@
               >
               <a
                 href="#"
+                @click="logoutProcess"
                 class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
                 >Sign out</a
               >
@@ -275,11 +312,34 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex";
+import axios from "axios";
+
 export default {
   data() {
     return {
-      isOpen: true,
+      isMenuOpen: true,
+      isDropdownOpen: true,
     };
+  },
+
+  methods: {
+    ...mapMutations(["setUserInfo"]),
+
+    logoutProcess: function () {
+      const auth = "Bearer ".concat(this.userInfo.authorisation.token);
+      axios.get("http://mymemo.local/api/logout", { headers: { Authorization: auth } }).then((res) => {
+        if (!res.data.error) {
+          localStorage.removeItem("userInfo");
+          this.setUserInfo(null);
+          this.$router.push("/");
+        }
+      });
+    },
+  },
+
+  computed: {
+    ...mapGetters(["userInfo"]),
   },
 };
 </script>

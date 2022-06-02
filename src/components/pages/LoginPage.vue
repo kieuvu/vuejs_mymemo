@@ -9,7 +9,7 @@
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div class="bg-white py-8 px-4 shadow-2xl sm:rounded-lg sm:px-10">
             <h4 class="text-3xl mb-4 font-light text-gray-900">Sign In</h4>
-            <form class="space-y-6" @submit.prevent="formSubmit()">
+            <form class="space-y-6" @submit.prevent="loginProcess()">
               <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">
                   Email address:
@@ -20,7 +20,7 @@
                     name="email"
                     type="text"
                     autocomplete="email"
-                    v-model="userinfo.email"
+                    v-model="formData.email"
                     class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
@@ -39,12 +39,15 @@
                     name="password"
                     type="password"
                     autocomplete="current-password"
-                    v-model="userinfo.password"
+                    v-model="formData.password"
                     class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
                 <div v-if="errors && errors.password">
                   <p class="mt-1 text-red-600">{{ errors.password[0] }}</p>
+                </div>
+                <div v-if="errors && errors.message">
+                  <p class="mt-1 text-red-600">{{ errors.message[0] }}</p>
                 </div>
               </div>
 
@@ -54,7 +57,7 @@
                     id="remember-me"
                     name="remember"
                     type="checkbox"
-                    v-model="userinfo.remember"
+                    v-model="formData.remember"
                     class="text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                   />
                   <label for="remember-me" class="m-0 ml-2 block text-sm text-gray-900">
@@ -153,40 +156,50 @@
 
 <script>
 import axios from "axios";
+import { mapMutations } from "vuex";
 
 export default {
   data() {
     return {
-      userinfo: {
+      formData: {
         email: null,
         password: null,
         remember: false,
       },
       errors: null,
+      userInfo: null,
     };
   },
 
   methods: {
-    formReset() {
-      this.userinfo = {
+    ...mapMutations(["setUserInfo"]),
+
+    formReset: function () {
+      this.formData = {
         email: null,
         password: null,
         remember: false,
       };
       this.errors = null;
     },
-    formSubmit() {
-      axios
-        .post("http://mymemo.local/api/login", {
-          ...this.userinfo,
-        })
-        .then((res) => {
-          this.formReset();
-          if (res.data.error) {
-            this.errors = res.data.details;
-            return;
-          }
-        });
+
+    loginProcess: function () {
+      axios.post("http://mymemo.local/api/login", this.formData).then((res) => {
+        this.formReset();
+
+        if (res.data.error) {
+          this.errors = res.data.details;
+          return;
+        }
+
+        this.userInfo = res.data.details;
+
+        localStorage.setItem("userInfo", JSON.stringify(this.userInfo));
+
+        this.setUserInfo(this.userInfo);
+
+        this.$router.push("/");
+      });
     },
   },
 };

@@ -9,7 +9,7 @@
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div class="bg-white py-8 px-4 shadow-2xl sm:rounded-lg sm:px-10">
             <h4 class="text-3xl mb-4 font-light text-gray-900">Sign Up</h4>
-            <form class="space-y-6" @submit.prevent="formSubmit()">
+            <form class="space-y-6" @submit.prevent="registerProcess()">
               <div>
                 <label for="name" class="block text-sm font-medium text-gray-700"> Username: </label>
                 <div class="mt-1">
@@ -18,7 +18,7 @@
                     name="name"
                     type="text"
                     autocomplete="name"
-                    v-model="userinfo.name"
+                    v-model="formData.name"
                     class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
@@ -37,7 +37,7 @@
                     name="email"
                     type="text"
                     autocomplete="email"
-                    v-model="userinfo.email"
+                    v-model="formData.email"
                     class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
@@ -56,7 +56,7 @@
                     name="password"
                     type="password"
                     autocomplete="password"
-                    v-model="userinfo.password"
+                    v-model="formData.password"
                     class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
@@ -74,7 +74,7 @@
                     name="password_confirmation"
                     type="password"
                     autocomplete="password_confirmation"
-                    v-model="userinfo.password_confirmation"
+                    v-model="formData.password_confirmation"
                     class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
@@ -169,7 +169,7 @@ import Swal from "sweetalert2";
 export default {
   data() {
     return {
-      userinfo: {
+      formData: {
         name: null,
         email: null,
         password: null,
@@ -180,8 +180,8 @@ export default {
   },
 
   methods: {
-    formReset() {
-      this.userinfo = {
+    formReset: function () {
+      this.formData = {
         name: null,
         email: null,
         password: null,
@@ -189,24 +189,21 @@ export default {
       };
       this.errors = null;
     },
-    formSubmit() {
-      axios
-        .post("http://mymemo.local/api/register", {
-          ...this.userinfo,
-        })
-        .then((res) => {
-          this.formReset();
-          if (res.data.error) {
-            this.errors = res.data.details;
-            return;
-          }
-          Swal.fire({
-            icon: "success",
-            title: "Sign Up Success",
-            text: "Congratulations on being one of our members !",
-            footer: '<a href="/login">Click here to login.</a>',
-          });
+
+    registerProcess: function () {
+      axios.post("http://mymemo.local/api/register", this.formData).then((res) => {
+        this.formReset();
+        if (res.data.error) {
+          this.errors = res.data.details;
+          return;
+        }
+        Swal.fire({
+          icon: "success",
+          title: "Sign Up Success",
+          text: "Congratulations on being one of our members !",
+          footer: '<a href="/login">Click here to login.</a>',
         });
+      });
     },
   },
 };

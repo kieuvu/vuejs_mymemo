@@ -2,9 +2,12 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import '@/styles/app.css';
 import router from './config/route/route';
-import VueSweetalert2 from 'vue-sweetalert2';
+import store from './config/store/store';
+
 
 const app = createApp(App);
+
 app.use(router);
-app.use(VueSweetalert2);
+app.use(store);
+
 app.mount('#app');
